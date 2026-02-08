@@ -1,0 +1,366 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Cook IRL — Technical Overview</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: #fff; color: #000; line-height: 1.6; padding: 40px; max-width: 900px; margin: 0 auto; }
+    h1 { font-size: 2rem; margin-bottom: 10px; }
+    h2 { font-size: 1.5rem; margin: 40px 0 20px; border-bottom: 1px solid #000; padding-bottom: 10px; }
+    h3 { font-size: 1.2rem; margin: 30px 0 15px; }
+    p { margin: 15px 0; }
+    blockquote { border-left: 3px solid #000; padding-left: 15px; margin: 20px 0; font-style: italic; }
+    table { width: 100%; border-collapse: collapse; margin: 20px 0; }
+    th, td { border: 1px solid #000; padding: 10px; text-align: left; }
+    th { font-weight: bold; }
+    pre { background: #f5f5f5; border: 1px solid #000; padding: 15px; overflow-x: auto; margin: 15px 0; font-family: 'Courier New', monospace; font-size: 0.9rem; }
+    code { font-family: 'Courier New', monospace; background: #f5f5f5; padding: 2px 5px; }
+    ul { margin: 15px 0; padding-left: 25px; }
+    li { margin: 8px 0; }
+    hr { border: none; border-top: 1px solid #000; margin: 30px 0; }
+    .footer { text-align: center; margin-top: 40px; font-style: italic; }
+  </style>
+</head>
+<body>
+
+<h1>Cook IRL — Technical Overview</h1>
+
+<blockquote>
+  <strong>AI-powered recipe extraction and management that bridges the gap between saving recipes, organizing and actually cooking them.</strong>
+</blockquote>
+
+<hr>
+
+<h2>Tech Stack</h2>
+
+<table>
+  <tr><th>Layer</th><th>Technology</th></tr>
+  <tr><td><strong>Mobile</strong></td><td>Flutter 3.9+, Riverpod, GoRouter</td></tr>
+  <tr><td><strong>Backend</strong></td><td>Node.js 22, TypeScript, Express</td></tr>
+  <tr><td><strong>AI/ML</strong></td><td>Google Gemini 2.5 Flash, Cloud Vision API, OpenAI Whisper</td></tr>
+  <tr><td><strong>Vector Search</strong></td><td>Pinecone (text-embedding-3-small, 512 dims)</td></tr>
+  <tr><td><strong>Database</strong></td><td>Firebase Firestore</td></tr>
+  <tr><td><strong>Infrastructure</strong></td><td>Firebase Functions, Cloud Run, Cloud Tasks</td></tr>
+  <tr><td><strong>Payments</strong></td><td>RevenueCat</td></tr>
+</table>
+
+<hr>
+
+<h2>Architecture</h2>
+
+<pre>
+┌──────────────────────────────────────────────────────────────────┐
+│                     Flutter Mobile App                            │
+│         (Riverpod State Management + GoRouter Navigation)         │
+└──────────────────────────────────────────────────────────────────┘
+                                │
+                    ┌───────────┴───────────┐
+                    ▼                       ▼
+         ┌──────────────────┐    ┌──────────────────┐
+         │ Firebase Auth    │    │ Cloud Run API    │
+         │ Firestore        │    │ (Express.js)     │
+         │ Cloud Storage    │    └────────┬─────────┘
+         └──────────────────┘             │
+                                          ▼
+                              ┌──────────────────────┐
+                              │   LangGraph Agent    │
+                              │  (Recipe Extraction) │
+                              └──────────┬───────────┘
+                    ┌────────────────────┼────────────────────┐
+                    ▼                    ▼                    ▼
+            ┌─────────────┐      ┌─────────────┐      ┌─────────────┐
+            │ Vision API  │      │ Gemini 2.5  │      │  Pinecone   │
+            │ (OCR)       │      │ (Parsing)   │      │ (Search)    │
+            └─────────────┘      └─────────────┘      └─────────────┘
+</pre>
+
+<hr>
+
+<h2>Core Features</h2>
+
+<h3>1. Universal Recipe Import</h3>
+
+<p>Import recipes from <strong>any source</strong> with AI-powered extraction:</p>
+
+<table>
+  <tr><th>Source</th><th>How It Works</th></tr>
+  <tr><td><strong>URL</strong></td><td>Paste any recipe link — Instagram, TikTok, YouTube, blogs — AI extracts structured data</td></tr>
+  <tr><td><strong>PDF</strong></td><td>Upload cookbook PDFs or scanned recipe documents</td></tr>
+  <tr><td><strong>Photo Scan</strong></td><td>Snap a photo of a recipe card, magazine page, or handwritten note</td></tr>
+  <tr><td><strong>Video</strong></td><td>Extract recipes from cooking videos with native multimodal AI</td></tr>
+  <tr><td><strong>iOS Share Extension</strong></td><td>Share directly from Safari, Instagram, TikTok — imports without leaving the app</td></tr>
+</table>
+
+<p><strong>AI Pipeline:</strong></p>
+<pre>Input → LangGraph Router → [PDF|Image|Video|URL|Text] → Gemini 2.5 Flash → Structured Recipe</pre>
+
+<ul>
+  <li><strong>Images</strong>: Vision API (OCR + labels) → Gemini parsing</li>
+  <li><strong>Videos</strong>: Native multimodal processing (frames + audio in single pass)</li>
+  <li><strong>URLs</strong>: Web scraper + structured extraction</li>
+  <li><strong>PDFs</strong>: pdf-parse + Vision API for scanned documents</li>
+</ul>
+
+<hr>
+
+<h3>2. Smart Recipe Search &amp; Discovery</h3>
+
+<p><strong>Three powerful ways to find recipes:</strong></p>
+
+<table>
+  <tr><th>Mode</th><th>How It Works</th></tr>
+  <tr><td><strong>Text Search</strong></td><td>Natural language queries ("quick pasta under 30 mins")</td></tr>
+  <tr><td><strong>Voice Search</strong></td><td>Speak your query — Whisper transcribes, AI searches</td></tr>
+  <tr><td><strong>Ingredient Scan</strong></td><td>Scan items in your fridge — find recipes you can make now</td></tr>
+</table>
+
+<p><strong>Hybrid Search Engine:</strong></p>
+<pre>// Vector embedding + metadata filters
+const results = await pinecone.query({
+  vector: embedding,  // text-embedding-3-small (512 dims)
+  filter: { userId, categories: { $in: ["dinner"] }, cookTime: { $lte: 1800 } },
+  topK: 20
+});</pre>
+
+<hr>
+
+<h3>3. Cookbook Organization</h3>
+
+<p><strong>Organize recipes your way:</strong></p>
+
+<ul>
+  <li><strong>Cookbooks</strong> — Group recipes into collections (Weeknight Dinners, Holiday Baking, etc.)</li>
+  <li><strong>Categories &amp; Tags</strong> — Filter by cuisine, meal type, difficulty, dietary restrictions</li>
+  <li><strong>Shared Cookbooks</strong> — Collaborate with family or friends on shared collections</li>
+  <li><strong>Favorites</strong> — Quick access to your most-loved recipes</li>
+</ul>
+
+<hr>
+
+<h3>4. Tasks &amp; Smart Reminders</h3>
+
+<p><strong>From recipe to reality:</strong></p>
+
+<table>
+  <tr><th>Feature</th><th>Description</th></tr>
+  <tr><td><strong>Task Lists</strong></td><td>Create shopping lists, meal prep tasks, cooking schedules</td></tr>
+  <tr><td><strong>Recipe Linking</strong></td><td>Attach tasks directly to recipes ("Buy ingredients for Lasagna")</td></tr>
+  <tr><td><strong>Subtasks</strong></td><td>Break down complex tasks with checkable subtasks</td></tr>
+  <tr><td><strong>Smart Reminders</strong></td><td>Push notifications at the right time — never forget to defrost</td></tr>
+  <tr><td><strong>Recurring Tasks</strong></td><td>Daily, weekly, or custom recurrence patterns</td></tr>
+</table>
+
+<p><strong>Server-Side Scheduler:</strong></p>
+<pre>Scheduler (every 5 min) → Query due tasks → FCM Topic (user_&lt;uid&gt;) → Push notification</pre>
+
+<p>Notification types: Shopping | Cooking | General</p>
+
+<hr>
+
+<h3>5. iOS Home Screen Widgets</h3>
+
+<p><strong>Your recipes, always accessible:</strong></p>
+
+<table>
+  <tr><th>Widget</th><th>Purpose</th></tr>
+  <tr><td><strong>Task Widget</strong></td><td>See today's cooking tasks at a glance</td></tr>
+  <tr><td><strong>Reminder Widget</strong></td><td>Upcoming reminders on your lock screen</td></tr>
+  <tr><td><strong>Recipe Widget</strong></td><td>Quick access to favorite recipes</td></tr>
+</table>
+
+<p>Built with <strong>WidgetKit</strong> — native iOS performance, background refresh, deep linking into the app.</p>
+
+<hr>
+
+<h3>6. Immersive Cooking Mode</h3>
+
+<p><strong>Step-by-step guidance while cooking:</strong></p>
+
+<ul>
+  <li><strong>Animated Backgrounds</strong> — Custom GLSL shaders for each cooking method (bake, fry, simmer, grill...)</li>
+  <li><strong>Built-in Timers</strong> — Per-step countdown timers with audio alerts</li>
+  <li><strong>Hands-Free</strong> — Voice commands and audio readout of instructions</li>
+  <li><strong>Keep Screen Awake</strong> — No more tapping with flour-covered fingers</li>
+</ul>
+
+<hr>
+
+<h2>Data Models</h2>
+
+<h3>Recipe</h3>
+<pre>{
+  id, name, userId,
+  ingredients: Record&lt;string, { name, quantity, unit, category }&gt;,
+  instructions: Record&lt;string, { text, timeType, timeInSeconds }&gt;,
+  categories: ["dinner", "italian"],
+  difficulty: "easy" | "medium" | "hard",
+  prepTimeInSeconds, cookTimeInSeconds,
+  images: Record&lt;string, { url, source }&gt;
+}</pre>
+
+<h3>Task (with Reminders)</h3>
+<pre>{
+  taskId, title, createdBy,
+  label: "shopping" | "cook" | "general",
+  subtasks: Record&lt;string, { title, completed }&gt;,
+  reminder: { remindAt: timestamp, recurrence: "daily" | "weekly" },
+  linkedRecipes: { recipes: string[], details: {...} }
+}</pre>
+
+<hr>
+
+<h2>Mobile App</h2>
+
+<p><strong>State Management:</strong> Riverpod 3.x with <code>DataResult&lt;T&gt;</code> pattern for loading states</p>
+
+<p><strong>Navigation:</strong> GoRouter with <code>StatefulShellRoute</code> for bottom navigation</p>
+
+<p><strong>Key Features:</strong></p>
+<ul>
+  <li>iOS Share Extension for importing from any app</li>
+  <li>Home Screen Widgets (WidgetKit) for task reminders</li>
+  <li>Custom GLSL shaders for cooking step animations</li>
+  <li>5-language localization (CSV-based)</li>
+</ul>
+
+<hr>
+
+<h2>RevenueCat Implementation</h2>
+
+<h3>Mobile SDK Integration (Flutter)</h3>
+
+<pre>// Fetch offerings (OfferingNotifier)
+void fetchOfferings() async {
+  final Offerings offerings = await Purchases.getOfferings();
+  state = state.copyWith(data: offerings.current);
+}
+
+// Purchase flow (CurrentPackageNotifier)
+Future&lt;void&gt; purchase(bool restore, Function() onCompleted) async {
+  if (restore) {
+    final info = await Purchases.restorePurchases();
+    if (info.activeSubscriptions.isEmpty) {
+      showToast("No active purchases found");
+    }
+    return;
+  }
+
+  final purchaseParams = PurchaseParams.package(selectedPackage);
+  await Purchases.purchase(purchaseParams);
+  onCompleted();
+}</pre>
+
+<h3>Entitlement Check</h3>
+
+<pre>// Check if user has active Pro subscription
+Package? get currentActiveUserPackage {
+  return state.data?.availablePackages.firstWhere(
+    (package) =&gt;
+        currentUser?.activeSubscription?.productId == 
+            package.storeProduct.identifier &amp;&amp;
+        currentUser?.activeSubscription?.status == 'active',
+  );
+}
+
+bool get isProUser =&gt; currentActiveUserPackage != null;</pre>
+
+<h3>Server-Side Webhook</h3>
+
+<pre>App Store → RevenueCat → POST /subscriptions/webhook → Firestore</pre>
+
+<p><strong>Webhook Events Handled:</strong></p>
+<pre>const PURCHASE_EVENTS = [
+  "INITIAL_PURCHASE", 
+  "RENEWAL", 
+  "SUBSCRIPTION_EXTENDED", 
+  "PRODUCT_CHANGE"
+];
+
+const CANCEL_EVENTS = [
+  "UNSUBSCRIBE", 
+  "EXPIRATION", 
+  "BILLING_ERROR", 
+  "BILLING_ISSUE"
+];</pre>
+
+<p><strong>Purchase Event Handler:</strong></p>
+<pre>async handlePurchaseEvent(event, user) {
+  const subscription = {
+    id: event.transaction_id,
+    productId: event.new_product_id ?? event.product_id,
+    entitlements: event.entitlement_ids || [],
+    promoCode: event.offer_code ?? null,
+    durations: {
+      startAt: event.purchased_at_ms,
+      endAt: event.expiration_at_ms,
+    },
+    status: "active",
+  };
+
+  await userService.updateSubscription(user.id, subscription);
+  
+  if (event.offer_code) {
+    await this.claimPromoCode(event.offer_code);
+  }
+  
+  await this.createTransaction(event, user);
+}</pre>
+
+<h3>Subscription Data Model</h3>
+
+<pre>// Stored in Firestore users/{uid}.activeSubscription
+activeSubscription: {
+  id: string,                    // transaction_id
+  productId: string,             // e.g. "cookirl_pro_monthly"
+  entitlements: string[],        // ["pro"]
+  promoCode: string | null,      // offer code if used
+  status: "active" | "cancelled" | "expired",
+  durations: { 
+    startAt: number,             // purchased_at_ms
+    endAt: number                // expiration_at_ms
+  },
+  updatedAt: number
+}</pre>
+
+<h3>Transaction Records</h3>
+
+<p>Each purchase creates a transaction record for analytics:</p>
+<pre>// Stored in Firestore transactions/{id}
+{
+  id, transactionId,
+  amount: { price, currency, type: "charge" },
+  createdBy: { uid, name, email },
+  meta: { subscriptionId, productId, durations }
+}</pre>
+
+<hr>
+
+<h2>Deployment</h2>
+
+<table>
+  <tr><th>Service</th><th>Region</th><th>Purpose</th></tr>
+  <tr><td>Cloud Run</td><td>europe-west3</td><td>API + AI agents</td></tr>
+  <tr><td>Firebase Functions</td><td>europe-west3</td><td>Triggers + schedulers</td></tr>
+  <tr><td>Cloud Tasks</td><td>europe-west3</td><td>Async recipe extraction</td></tr>
+  <tr><td>Pinecone</td><td>us-east-1</td><td>Vector search</td></tr>
+</table>
+
+<hr>
+
+<h2>Security</h2>
+
+<ul>
+  <li>Firebase Auth with Google/Apple Sign-In</li>
+  <li>Owner-only access to recipes/cookbooks</li>
+  <li>Rate limiting (100 req/15 min)</li>
+  <li>Input validation on all endpoints</li>
+</ul>
+
+<hr>
+
+<p class="footer"><em>Built with Flutter, Firebase, and Google AI</em></p>
+
+</body>
+</html>
