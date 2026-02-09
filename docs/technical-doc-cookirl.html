@@ -93,7 +93,7 @@ User → RevenueCat SDK (Flutter) → App Store → RevenueCat Dashboard
 
 <hr>
 
-<h2>Core Features</h2>
+<h2>Core Features (Summary)</h2>
 
 <table>
   <tr><th>Feature</th><th>Technical Implementation</th></tr>
@@ -104,10 +104,16 @@ User → RevenueCat SDK (Flutter) → App Store → RevenueCat Dashboard
   <tr><td><strong>iOS Widgets</strong> (small, medium, large, lock screen)</td><td>WidgetKit with background refresh and deep linking</td></tr>
   <tr><td><strong>Story Mode</strong></td><td>Instagram Stories-style step-by-step cooking interface with confetti on completion</td></tr>
   <tr><td><strong>Export</strong></td><td>Generate and share recipe as PDF</td></tr>
+  <tr><td><strong>Health Benefit Alerts</strong></td><td>On recipe save → enrollment with spread scheduling (0-30 min) → scheduler (every 10 min) → Gemini analyzes nutrition vs user health goals → if ≥70% confidence match → auto-create cooking task + FCM push notification. Rate limited to 3 alerts/user/day.</td></tr>
 </table>
 
 <p><strong>AI Pipeline:</strong></p>
 <pre>Input → LangGraph Router → [PDF|Image|Video|URL|Text] → Gemini 2.5 Flash → Structured Recipe → Pinecone Embedding</pre>
+
+<p><strong>Health Benefit Alerts Pipeline:</strong></p>
+<pre>Recipe Created → Enrollment (0-30 min spread) → Scheduler (every 10 min) → Gemini AI Analysis
+  → Match (≥70% confidence) → Create Task + Send Push Notification
+  → No Match → Mark as no_match</pre>
 
 <hr>
 
@@ -132,6 +138,23 @@ User → RevenueCat SDK (Flutter) → App Store → RevenueCat Dashboard
   linkedRecipes: { recipes: string[], details: {...} }
 }</pre>
 
+<h3>Health Alert Enrollment</h3>
+<pre>{
+  id, userId, recipeId, recipeName,
+  recipeCategories: string[],
+  scheduledAt: number,
+  status: "pending" | "processed" | "no_match" | "skipped" | "failed",
+  createdAt: number,
+  processedAt?: number,
+  matchResult?: {
+    isMatch: boolean,
+    confidence: number,        // 0.0 - 1.0, threshold ≥ 0.7
+    matchedBenefits: string[], // e.g. ["high_protein", "low_carb"]
+    reasoning: string,
+    suggestedTaskTitle?: string
+  }
+}</pre>
+
 <hr>
 
 <h2>Mobile App</h2>
@@ -150,6 +173,7 @@ User → RevenueCat SDK (Flutter) → App Store → RevenueCat Dashboard
   <li>iOS Share Extension for importing directly from other apps</li>
   <li>Home Screen Widgets (small, medium, large) and Lock Screen Widgets via WidgetKit</li>
   <li>Recipe export as shareable PDF</li>
+  <li>Health benefit alerts — AI matches saved recipes to user health goals with auto-task creation</li>
 </ul>
 
 <hr>
@@ -165,7 +189,7 @@ User → RevenueCat SDK (Flutter) → App Store → RevenueCat Dashboard
   <tr><td><strong>Annual</strong></td><td>$119/year</td><td>Pro</td></tr>
 </table>
 
-<p><strong>Pro unlocks:</strong> Cookbook PDF imports, video extraction from social media, camera OCR scanning, voice search. Free users can add recipes manually, organize cookbooks, use story mode, and set reminders.</p>
+<p><strong>Pro unlocks:</strong> Cookbook PDF imports, video extraction from social media, camera OCR scanning, voice search, health benefit alerts. Free users can add recipes manually, organize cookbooks, use story mode, and set reminders.</p>
 
 <h3>Mobile SDK Integration (Flutter)</h3>
 
