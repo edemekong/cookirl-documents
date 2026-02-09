@@ -54,6 +54,8 @@
 ┌──────────────────────────────────────────────────────────────────┐
 │                     Flutter Mobile App                            │
 │         (Riverpod State Management + GoRouter Navigation)         │
+│                                                                    │
+│  Video Share → Device downloads video → Uploads to server         │
 └──────────────────────────────────────────────────────────────────┘
                                 │
                     ┌───────────┴───────────┐
@@ -78,100 +80,34 @@
 
 <hr>
 
+<h3>Subscription Flow</h3>
+<pre>
+User → RevenueCat SDK (Flutter) → App Store → RevenueCat Dashboard
+                                                      │
+                                          POST /subscriptions/webhook
+                                                      │
+                                                      ▼
+                                              Firestore (user doc)
+                                          activeSubscription updated
+</pre>
+
+<hr>
+
 <h2>Core Features</h2>
 
-<h3>1. Universal Recipe Import</h3>
-
-<p>Import recipes from <strong>any source</strong> with AI-powered extraction:</p>
-
 <table>
-  <tr><th>Source</th><th>How It Works</th></tr>
-  <tr><td><strong>URL</strong></td><td>Paste any recipe link — AI extracts structured data</td></tr>
-  <tr><td><strong>Video Share</strong></td><td>Share cooking videos from TikTok, Instagram, YouTube, Facebook directly to Cook IRL</td></tr>
-  <tr><td><strong>PDF Cookbook</strong></td><td>Upload a cookbook PDF — AI extracts individual recipes from the entire book</td></tr>
-  <tr><td><strong>Camera Scan</strong></td><td>Scan a physical cookbook page or recipe card with your camera</td></tr>
-  <tr><td><strong>Manual Entry</strong></td><td>Add your own recipes by hand</td></tr>
+  <tr><th>Feature</th><th>Technical Implementation</th></tr>
+  <tr><td><strong>Recipe Import</strong> (URL, video, PDF, camera, manual)</td><td>LangGraph agent routes to appropriate tool → Gemini 2.5 Flash extracts structured data. Videos use device-first download then server-side multimodal processing.</td></tr>
+  <tr><td><strong>Search</strong> (natural language, voice, ingredient scan)</td><td>Pinecone vector search (text-embedding-3-small, 512 dims) with metadata filters. Whisper for voice transcription. Vision API for ingredient scanning.</td></tr>
+  <tr><td><strong>Cookbook Organization</strong></td><td>User-created collections in Firestore</td></tr>
+  <tr><td><strong>Tasks &amp; Reminders</strong></td><td>Server-side scheduler (5 min interval) → FCM push notifications. Tasks link to recipes and grocery lists.</td></tr>
+  <tr><td><strong>iOS Widgets</strong> (small, medium, large, lock screen)</td><td>WidgetKit with background refresh and deep linking</td></tr>
+  <tr><td><strong>Story Mode</strong></td><td>Instagram Stories-style step-by-step cooking interface with confetti on completion</td></tr>
+  <tr><td><strong>Export</strong></td><td>Generate and share recipe as PDF</td></tr>
 </table>
 
 <p><strong>AI Pipeline:</strong></p>
-<pre>Input → LangGraph Router → [PDF|Image|Video|URL|Text] → Gemini 2.5 Flash → Structured Recipe</pre>
-
-<ul>
-  <li><strong>Images</strong>: Vision API (OCR + labels) → Gemini parsing</li>
-  <li><strong>Videos</strong>: Native multimodal processing (frames + audio in single pass)</li>
-  <li><strong>URLs</strong>: Web scraper + structured extraction</li>
-  <li><strong>PDFs</strong>: pdf-parse + Vision API for scanned documents</li>
-</ul>
-
-<hr>
-
-<h3>2. Smart Recipe Search</h3>
-
-<p><strong>Three ways to find recipes:</strong></p>
-
-<table>
-  <tr><th>Mode</th><th>How It Works</th></tr>
-  <tr><td><strong>Natural Language</strong></td><td>Type queries like "quick pasta under 30 mins" — Pinecone vector search understands intent</td></tr>
-  <tr><td><strong>Voice Search</strong></td><td>Speak your query — Whisper transcribes, AI searches</td></tr>
-  <tr><td><strong>Ingredient Scan</strong></td><td>Scan items with your camera — find recipes you can make now</td></tr>
-</table>
-
-<p><strong>Hybrid Search Engine:</strong></p>
-<pre>// Vector embedding + metadata filters
-const results = await pinecone.query({
-  vector: embedding,  // text-embedding-3-small (512 dims)
-  filter: { userId, categories: { $in: ["dinner"] }, cookTime: { $lte: 1800 } },
-  topK: 20
-});</pre>
-
-<hr>
-
-<h3>3. Cookbook Organization</h3>
-
-<p>Create your own <strong>cookbooks</strong> inside the app to group and organize recipes however you want.</p>
-
-<hr>
-
-<h3>4. Tasks &amp; Reminders</h3>
-
-<p><strong>From recipe to reality:</strong></p>
-
-<table>
-  <tr><th>Feature</th><th>Description</th></tr>
-  <tr><td><strong>Task Lists</strong></td><td>Create cooking tasks and grocery shopping lists</td></tr>
-  <tr><td><strong>Recipe Linking</strong></td><td>Attach tasks directly to recipes ("Buy ingredients for Lasagna")</td></tr>
-  <tr><td><strong>Grocery Lists</strong></td><td>Tap any ingredient to add it to your shopping list</td></tr>
-  <tr><td><strong>Reminders</strong></td><td>Push notifications so you don't forget to cook or shop</td></tr>
-</table>
-
-<p><strong>Server-Side Scheduler:</strong></p>
-<pre>Scheduler (every 5 min) → Query due tasks → FCM Topic (user_&lt;uid&gt;) → Push notification</pre>
-
-<p>Notification types: Shopping | Cooking</p>
-
-<hr>
-
-<h3>5. iOS Home Screen Widgets</h3>
-
-<table>
-  <tr><th>Widget</th><th>Sizes</th><th>Shows</th></tr>
-  <tr><td><strong>Task Widget</strong></td><td>Small, Medium, Large</td><td>Current tasks, cooking plans, grocery shopping</td></tr>
-  <tr><td><strong>Lock Screen Widget</strong></td><td>Lock screen</td><td>What's in your tasks, cooking, or grocery list</td></tr>
-</table>
-
-<p>Built with <strong>WidgetKit</strong> — native iOS performance, background refresh, deep linking into the app.</p>
-
-<hr>
-
-<h3>6. Story Mode (Cooking Interface)</h3>
-
-<p>Step-by-step cooking instructions presented <strong>Instagram Stories-style</strong>. Each step shows what you need, what to do, and timing. Finish a recipe and confetti celebrates your completion.</p>
-
-<hr>
-
-<h3>7. Export &amp; Share</h3>
-
-<p>Export any recipe as a <strong>PDF</strong> and share it with anyone.</p>
+<pre>Input → LangGraph Router → [PDF|Image|Video|URL|Text] → Gemini 2.5 Flash → Structured Recipe → Pinecone Embedding</pre>
 
 <hr>
 
@@ -219,6 +155,17 @@ const results = await pinecone.query({
 <hr>
 
 <h2>RevenueCat Implementation</h2>
+
+<h3>Subscription Plans</h3>
+
+<table>
+  <tr><th>Plan</th><th>Price</th><th>Entitlement</th></tr>
+  <tr><td><strong>Weekly</strong></td><td>$2.99/week</td><td>Pro</td></tr>
+  <tr><td><strong>Bi-Monthly</strong></td><td>$20/2 months</td><td>Pro</td></tr>
+  <tr><td><strong>Annual</strong></td><td>$119/year</td><td>Pro</td></tr>
+</table>
+
+<p><strong>Pro unlocks:</strong> Cookbook PDF imports, video extraction from social media, camera OCR scanning, voice search. Free users can add recipes manually, organize cookbooks, use story mode, and set reminders.</p>
 
 <h3>Mobile SDK Integration (Flutter)</h3>
 
