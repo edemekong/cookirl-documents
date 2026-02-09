@@ -28,7 +28,7 @@
 <h1>Cook IRL — Technical Overview</h1>
 
 <blockquote>
-  <strong>AI-powered recipe extraction and management that bridges the gap between saving recipes, organizing and actually cooking them.</strong>
+  <strong>A cooking accountability system that takes recipes from wherever you find them, keeps them organized, and pushes you to actually cook them.</strong>
 </blockquote>
 
 <hr>
@@ -86,11 +86,11 @@
 
 <table>
   <tr><th>Source</th><th>How It Works</th></tr>
-  <tr><td><strong>URL</strong></td><td>Paste any recipe link — Instagram, TikTok, YouTube, blogs — AI extracts structured data</td></tr>
-  <tr><td><strong>PDF</strong></td><td>Upload cookbook PDFs or scanned recipe documents</td></tr>
-  <tr><td><strong>Photo Scan</strong></td><td>Snap a photo of a recipe card, magazine page, or handwritten note</td></tr>
-  <tr><td><strong>Video</strong></td><td>Extract recipes from cooking videos with native multimodal AI</td></tr>
-  <tr><td><strong>iOS Share Extension</strong></td><td>Share directly from Safari, Instagram, TikTok — imports without leaving the app</td></tr>
+  <tr><td><strong>URL</strong></td><td>Paste any recipe link — AI extracts structured data</td></tr>
+  <tr><td><strong>Video Share</strong></td><td>Share cooking videos from TikTok, Instagram, YouTube, Facebook directly to Cook IRL</td></tr>
+  <tr><td><strong>PDF Cookbook</strong></td><td>Upload a cookbook PDF — AI extracts individual recipes from the entire book</td></tr>
+  <tr><td><strong>Camera Scan</strong></td><td>Scan a physical cookbook page or recipe card with your camera</td></tr>
+  <tr><td><strong>Manual Entry</strong></td><td>Add your own recipes by hand</td></tr>
 </table>
 
 <p><strong>AI Pipeline:</strong></p>
@@ -105,15 +105,15 @@
 
 <hr>
 
-<h3>2. Smart Recipe Search &amp; Discovery</h3>
+<h3>2. Smart Recipe Search</h3>
 
-<p><strong>Three powerful ways to find recipes:</strong></p>
+<p><strong>Three ways to find recipes:</strong></p>
 
 <table>
   <tr><th>Mode</th><th>How It Works</th></tr>
-  <tr><td><strong>Text Search</strong></td><td>Natural language queries ("quick pasta under 30 mins")</td></tr>
+  <tr><td><strong>Natural Language</strong></td><td>Type queries like "quick pasta under 30 mins" — Pinecone vector search understands intent</td></tr>
   <tr><td><strong>Voice Search</strong></td><td>Speak your query — Whisper transcribes, AI searches</td></tr>
-  <tr><td><strong>Ingredient Scan</strong></td><td>Scan items in your fridge — find recipes you can make now</td></tr>
+  <tr><td><strong>Ingredient Scan</strong></td><td>Scan items with your camera — find recipes you can make now</td></tr>
 </table>
 
 <p><strong>Hybrid Search Engine:</strong></p>
@@ -128,62 +128,50 @@ const results = await pinecone.query({
 
 <h3>3. Cookbook Organization</h3>
 
-<p><strong>Organize recipes your way:</strong></p>
-
-<ul>
-  <li><strong>Cookbooks</strong> — Group recipes into collections (Weeknight Dinners, Holiday Baking, etc.)</li>
-  <li><strong>Categories &amp; Tags</strong> — Filter by cuisine, meal type, difficulty, dietary restrictions</li>
-  <li><strong>Shared Cookbooks</strong> — Collaborate with family or friends on shared collections</li>
-  <li><strong>Favorites</strong> — Quick access to your most-loved recipes</li>
-</ul>
+<p>Create your own <strong>cookbooks</strong> inside the app to group and organize recipes however you want.</p>
 
 <hr>
 
-<h3>4. Tasks &amp; Smart Reminders</h3>
+<h3>4. Tasks &amp; Reminders</h3>
 
 <p><strong>From recipe to reality:</strong></p>
 
 <table>
   <tr><th>Feature</th><th>Description</th></tr>
-  <tr><td><strong>Task Lists</strong></td><td>Create shopping lists, meal prep tasks, cooking schedules</td></tr>
+  <tr><td><strong>Task Lists</strong></td><td>Create cooking tasks and grocery shopping lists</td></tr>
   <tr><td><strong>Recipe Linking</strong></td><td>Attach tasks directly to recipes ("Buy ingredients for Lasagna")</td></tr>
-  <tr><td><strong>Subtasks</strong></td><td>Break down complex tasks with checkable subtasks</td></tr>
-  <tr><td><strong>Smart Reminders</strong></td><td>Push notifications at the right time — never forget to defrost</td></tr>
-  <tr><td><strong>Recurring Tasks</strong></td><td>Daily, weekly, or custom recurrence patterns</td></tr>
+  <tr><td><strong>Grocery Lists</strong></td><td>Tap any ingredient to add it to your shopping list</td></tr>
+  <tr><td><strong>Reminders</strong></td><td>Push notifications so you don't forget to cook or shop</td></tr>
 </table>
 
 <p><strong>Server-Side Scheduler:</strong></p>
 <pre>Scheduler (every 5 min) → Query due tasks → FCM Topic (user_&lt;uid&gt;) → Push notification</pre>
 
-<p>Notification types: Shopping | Cooking | General</p>
+<p>Notification types: Shopping | Cooking</p>
 
 <hr>
 
 <h3>5. iOS Home Screen Widgets</h3>
 
-<p><strong>Your recipes, always accessible:</strong></p>
-
 <table>
-  <tr><th>Widget</th><th>Purpose</th></tr>
-  <tr><td><strong>Task Widget</strong></td><td>See today's cooking tasks at a glance</td></tr>
-  <tr><td><strong>Reminder Widget</strong></td><td>Upcoming reminders on your lock screen</td></tr>
-  <tr><td><strong>Recipe Widget</strong></td><td>Quick access to favorite recipes</td></tr>
+  <tr><th>Widget</th><th>Sizes</th><th>Shows</th></tr>
+  <tr><td><strong>Task Widget</strong></td><td>Small, Medium, Large</td><td>Current tasks, cooking plans, grocery shopping</td></tr>
+  <tr><td><strong>Lock Screen Widget</strong></td><td>Lock screen</td><td>What's in your tasks, cooking, or grocery list</td></tr>
 </table>
 
 <p>Built with <strong>WidgetKit</strong> — native iOS performance, background refresh, deep linking into the app.</p>
 
 <hr>
 
-<h3>6. Immersive Cooking Mode</h3>
+<h3>6. Story Mode (Cooking Interface)</h3>
 
-<p><strong>Step-by-step guidance while cooking:</strong></p>
+<p>Step-by-step cooking instructions presented <strong>Instagram Stories-style</strong>. Each step shows what you need, what to do, and timing. Finish a recipe and confetti celebrates your completion.</p>
 
-<ul>
-  <li><strong>Animated Backgrounds</strong> — Custom GLSL shaders for each cooking method (bake, fry, simmer, grill...)</li>
-  <li><strong>Built-in Timers</strong> — Per-step countdown timers with audio alerts</li>
-  <li><strong>Hands-Free</strong> — Voice commands and audio readout of instructions</li>
-  <li><strong>Keep Screen Awake</strong> — No more tapping with flour-covered fingers</li>
-</ul>
+<hr>
+
+<h3>7. Export &amp; Share</h3>
+
+<p>Export any recipe as a <strong>PDF</strong> and share it with anyone.</p>
 
 <hr>
 
@@ -203,9 +191,8 @@ const results = await pinecone.query({
 <h3>Task (with Reminders)</h3>
 <pre>{
   taskId, title, createdBy,
-  label: "shopping" | "cook" | "general",
-  subtasks: Record&lt;string, { title, completed }&gt;,
-  reminder: { remindAt: timestamp, recurrence: "daily" | "weekly" },
+  label: "shopping" | "cook",
+  reminder: { remindAt: timestamp },
   linkedRecipes: { recipes: string[], details: {...} }
 }</pre>
 
@@ -219,10 +206,14 @@ const results = await pinecone.query({
 
 <p><strong>Key Features:</strong></p>
 <ul>
-  <li>iOS Share Extension for importing from any app</li>
-  <li>Home Screen Widgets (WidgetKit) for task reminders</li>
-  <li>Custom GLSL shaders for cooking step animations</li>
-  <li>5-language localization (CSV-based)</li>
+  <li>Universal recipe import — URL, video share, PDF cookbook, camera scan, manual entry</li>
+  <li>AI-powered search with voice input and camera ingredient scanning</li>
+  <li>Cookbook creation and recipe organization</li>
+  <li>Tasks and reminders linked to recipes and grocery lists</li>
+  <li>Instagram Stories-style step-by-step cooking interface</li>
+  <li>iOS Share Extension for importing directly from other apps</li>
+  <li>Home Screen Widgets (small, medium, large) and Lock Screen Widgets via WidgetKit</li>
+  <li>Recipe export as shareable PDF</li>
 </ul>
 
 <hr>
@@ -313,7 +304,7 @@ const CANCEL_EVENTS = [
 <pre>// Stored in Firestore users/{uid}.activeSubscription
 activeSubscription: {
   id: string,                    // transaction_id
-  productId: string,             // e.g. "cookirl_pro_monthly"
+  productId: string,             // e.g. "cookirl_pro_weekly"
   entitlements: string[],        // ["pro"]
   promoCode: string | null,      // offer code if used
   status: "active" | "cancelled" | "expired",
