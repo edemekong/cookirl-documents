@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Cook IRL — Written Proposal</title>
+  <link href="https://fonts.googleapis.com/css2?family=Source+Serif+4:ital,wght@0,400;0,600;0,700;1,400&family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      background: #ffffff;
+      color: #111111;
+      font-family: 'Source Serif 4', Georgia, serif;
+      font-size: 16px;
+      line-height: 1.7;
+      padding: 3rem 2rem;
+      max-width: 720px;
+      margin: 0 auto;
+    }
+
+    header {
+      margin-bottom: 2rem;
+      padding-bottom: 1.5rem;
+      border-bottom: 2px solid #111;
+    }
+
+    header h1 {
+      font-family: 'DM Sans', sans-serif;
+      font-size: 2rem;
+      font-weight: 700;
+      letter-spacing: -0.5px;
+      margin-bottom: 0.25rem;
+    }
+
+    header p {
+      font-size: 0.95rem;
+      color: #555;
+      font-family: 'DM Sans', sans-serif;
+    }
+
+    h2 {
+      font-family: 'DM Sans', sans-serif;
+      font-size: 1.2rem;
+      font-weight: 600;
+      margin-top: 2rem;
+      margin-bottom: 0.75rem;
+      letter-spacing: -0.3px;
+    }
+
+    p {
+      margin-bottom: 1rem;
+    }
+
+    strong {
+      font-weight: 600;
+    }
+
+    .pricing {
+      margin: 1rem 0;
+      padding: 1rem 1.25rem;
+      border-left: 3px solid #111;
+      background: #fafafa;
+      font-family: 'DM Sans', sans-serif;
+      font-size: 0.95rem;
+      line-height: 1.8;
+    }
+
+    footer {
+      margin-top: 2.5rem;
+      padding-top: 1.5rem;
+      border-top: 1px solid #ddd;
+      font-size: 0.85rem;
+      color: #777;
+      font-family: 'DM Sans', sans-serif;
+    }
+
+    @media print {
+      body { padding: 1.5rem; font-size: 15px; }
+    }
+  </style>
+</head>
+<body>
+
+  <header>
+    <h1>Cook IRL — Written Proposal</h1>
+    <p>RevenueCat Shipyard Creator Contest · Eitan Bernath Brief</p>
+  </header>
+
+  <h2>The Problem</h2>
+  <p>
+    People save recipes constantly but rarely cook them. A TikTok video gets saved, an Instagram reel gets bookmarked, a cookbook page gets photographed — and then nothing happens. The recipe sits in a camera roll or saved folder indefinitely. The gap between discovering a recipe and actually cooking it is where most people get stuck.
+  </p>
+  <p>
+    Existing recipe apps focus on browsing and discovery. They help you find more recipes, not cook the ones you already have. There is no tool that takes a recipe from wherever you found it — a video, a link, a photo — and turns it into something you can actually follow in your kitchen. The problem is not finding recipes. The problem is cooking them.
+  </p>
+
+  <h2>Target Audience</h2>
+  <p>
+    Cook IRL targets home cooks who are overwhelmed by saved recipes. These are people who actively engage with food content online — they follow creators on TikTok, Instagram, and YouTube, save videos and posts, and genuinely want to cook — but struggle to bridge the gap between saving and doing. They are not beginners who need to learn cooking from scratch. They are motivated but disorganized.
+  </p>
+  <p>
+    The primary audience aligns directly with Eitan Bernath's followers: food-curious individuals aged 18–35 who consume recipe content daily across social media. They have the intent but lack the system to follow through.
+  </p>
+
+  <h2>The Solution</h2>
+  <p>
+    Cook IRL is a cooking accountability system. It takes recipes from wherever you find them and pushes you to actually cook them.
+  </p>
+  <p>
+    <strong>Import from anywhere.</strong> Paste a URL from any recipe site. Share a cooking video directly from TikTok, Instagram, YouTube, or Facebook. Drop in a PDF cookbook and extract every recipe from it. Scan a physical cookbook page with your camera. Or add a recipe manually. Cook IRL handles every format people actually use to save recipes.
+  </p>
+  <p>
+    <strong>Organize and remember.</strong> Create your own cookbooks inside the app to group recipes however you want. Set tasks and reminders — link a recipe or a grocery list to a task so it stays visible. Tap any ingredient to add it to your grocery list. iOS widgets (small, medium, large, and lock screen) display your tasks, what you're cooking, and what you need to buy. Nothing gets buried.
+  </p>
+  <p>
+    <strong>Actually cook.</strong> When you're ready, Cook IRL switches to story mode — step-by-step instructions presented Instagram-style. Each step shows what you need, what to do, and how long it takes. Finish a recipe and confetti pops. Find recipes with voice search, camera ingredient scanning, or natural language queries powered by vector search. Export any recipe as a PDF to share with others.
+  </p>
+
+  <h2>Monetization Strategy</h2>
+  <p>
+    Cook IRL uses a freemium model with a subscription for Pro features. Free users can add recipes manually, organize cookbooks, use story mode, and set basic reminders. Pro unlocks the features that rely on AI processing: cookbook PDF imports, video extraction from social media, camera OCR scanning, and voice search.
+  </p>
+
+  <div class="pricing">
+    <strong>$2.99/week</strong> · <strong>$20/2 months</strong> · <strong>$119/year</strong><br>
+    Pro: cookbook imports, video extraction, OCR scanning, voice search
+  </div>
+
+  <p>
+    This pricing reflects the real cost of AI processing — extracting 30+ recipes from a single cookbook costs roughly $0.02, keeping margins healthy at scale. The value proposition is clear: Pro users get the ability to import recipes from any source automatically, which is the core differentiator of the app.
+  </p>
+  <p>
+    Monetization is built into the product's value, not bolted on. The features people pay for are the features that solve the hardest part of the problem — getting recipes out of videos, links, and cookbooks into a format you can actually cook from.
+  </p>
+
+  <h2>Why It Works</h2>
+  <p>
+    Cook IRL does not compete with recipe discovery apps. It starts where they stop. Every recipe app helps you find something new. Cook IRL helps you cook what you already found. That distinction — from saved to cooked — is the entire product. Persistent reminders, visible widgets, and an import system that meets people where their recipes actually live make the difference between another app and a behavior change.
+  </p>
+
+</body>
+</html>
